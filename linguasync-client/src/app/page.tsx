@@ -1,11 +1,11 @@
 "use client";
-import ChatUI from '@/components/conversation/ChatUI';
+import ChatUI from "@/components/conversation/ChatUI";
 
 export default function Home() {
   return (
-    <main className="flex flex-col h-screen overflow-hidden bg-zinc-950">
+    <main className="flex items-center justify-center h-screen overflow-hidden bg-zinc-950 p-4 sm:p-8">
       {/* Primary surface: Centered Chat View */}
-      <div className="flex-1 max-w-7xl mx-auto w-full relative">
+      <div className="w-full max-w-4xl h-[90vh] max-h-[800px] relative">
         <ChatUI />
       </div>
     </main>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { LingoMCP, LingoStatus } from '@lingo.dev/sdk';
+import {LingoStatus } from '@lingo.dev/sdk';
 
 interface Message {
   id: string;
