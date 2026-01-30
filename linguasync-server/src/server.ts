@@ -58,10 +58,14 @@ wss.on('connection', (ws: WebSocket) => {
     const socketId = 'sock_' + Math.random().toString(36).substr(2, 9);
     sockets.set(socketId, ws);
     
-    console.log(`[WS] Client connected: ${socketId}`);
     
     // CRITICAL: Unconditional MCP readiness broadcast
     const mcpReadyPayload = JSON.stringify({ type: 'MCP_READY' });
+    console.log(`[WS] Client connected: ${socketId}`);
+     ws.send(JSON.stringify({
+      type: 'INIT',
+      socketId
+     }));
     ws.send(mcpReadyPayload);
     console.log(`[WS] Sent MCP_READY to ${socketId}`);
     console.log(`[Backend] MCP_READY broadcast sent to clients`);

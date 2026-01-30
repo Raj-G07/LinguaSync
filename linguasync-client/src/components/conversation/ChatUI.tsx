@@ -3,8 +3,10 @@
 import { useLingo } from "@/context/LingoContext";
 import { LingoStatus } from "@lingo.dev/sdk";
 import React, { useState, useEffect, useRef } from "react";
-
+import { LanguageIcon } from "../ui/language";
+import { PaperAirplaneIcon } from "../ui/paper-airplane";
 // --- Icon Components (self-contained to avoid external dependencies) ---
+
 
 const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -37,24 +39,6 @@ const MessageSquareIcon = (props: React.SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-  </svg>
-);
-
-const SendIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="m22 2-7 20-4-9-9-4Z" />
-    <path d="M22 2 11 13" />
   </svg>
 );
 
@@ -169,7 +153,7 @@ const EmptyState = () => (
 );
 
 const MessageList = () => {
-  const { messages } = useLingo();
+  const { messages, socketId } = useLingo();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -183,12 +167,17 @@ const MessageList = () => {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       {messages.map((msg) => (
-        <div key={msg.id} className="flex flex-col items-start">
+        <div
+          key={msg.id}
+          className={`flex flex-col ${
+            msg.sender === socketId ? "items-start" : "items-end"
+          }`}
+        >
           <div className="text-xs text-[#69e300] mb-1 font-medium">
-            {msg.sender}
+            {msg.sender === socketId ? "You" : msg.sender}
           </div>
-          <div className="rounded-lg bg-zinc-900 px-4 py-2.5 max-w-[85%] sm:max-w-[75%]">
-            <p className="text-zinc-200 whitespace-pre-wrap break-words">
+          <div className={`rounded-lg ${msg.sender === socketId ? "bg-[#69e300]" : "bg-zinc-900"} px-4 py-2.5 max-w-[85%] sm:max-w-[75%]`}>
+            <p className={`${msg.sender === socketId ? "text-black" : "text-zinc-200"} whitespace-pre-wrap break-words`}>
               {msg.content}
             </p>
           </div>
@@ -227,25 +216,30 @@ const MessageInput = () => {
   return (
     <div className="px-4 sm:px-6 py-3 bg-[#0a0a0a]/60 backdrop-blur-sm border-t border-zinc-900 flex-shrink-0">
       <form onSubmit={handleSubmit} className="flex items-center gap-3">
-        <input
-          type="text"
-          value={content}
-          onChange={(e) =>
-            e.target.value.length < 2048 && setContent(e.target.value)
-          }
-          onKeyDown={handleKeyPress}
-          placeholder="Type your message..."
-          className="flex-1 bg-zinc-900 rounded-lg px-4 py-2.5 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-[#69e300] border border-transparent"
-          disabled={status !== "connected"}
-          autoComplete="off"
-        />
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={content}
+            onChange={(e) =>
+              e.target.value.length < 2048 && setContent(e.target.value)
+            }
+            onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
+            className="w-full bg-zinc-900 rounded-lg pl-4 pr-10 py-2.5 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-[#69e300] border border-transparent"
+            disabled={status !== "connected"}
+            autoComplete="off"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400">
+            <LanguageIcon size={20} />
+          </div>
+        </div>
         <button
           type="submit"
           disabled={!canSend}
           aria-label="Send message"
-          className="bg-[#69e300] text-black rounded-full p-2.5 flex items-center justify-center hover:bg-[#7fed1a] transition-colors disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-[#69e300]"
+          className="bg-[#69e300] text-black rounded-full p-2 flex items-center justify-center hover:bg-[#7fed1a] transition-colors disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-[#69e300]"
         >
-          <SendIcon className="w-5 h-5" />
+          <PaperAirplaneIcon/>
         </button>
       </form>
       <div className="flex items-center justify-center gap-2 text-xs text-zinc-600 text-center pt-3">

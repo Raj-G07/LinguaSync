@@ -19,18 +19,20 @@ interface LingoState {
 interface LingoContextType extends LingoState {
   sendMessage: (content: string, type?: string) => void;
   setLanguage: (lang: string) => void;
+  socketId: string | null;
 }
 
 const LingoContext = createContext<LingoContextType | undefined>(undefined);
 
-const WS_URL = "ws://localhost:3101";
+const WS_URL = process.env.NEXT_PUBLIC_LINGO_WS_URL!;
 
 export function LingoProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<LingoStatus>('connecting');
   const [targetLanguage, setTargetLanguage] = useState<string>('en-US'); 
   const [mcpSessionId, setMcpSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  
+  const [socketId, setSocketId] = useState<string | null>(null);
+
   const socketRef = useRef<WebSocket | null>(null);
   const currentLangRef = useRef<string>('en-US');
   const isConnectingRef = useRef<boolean>(false);
@@ -70,6 +72,9 @@ export function LingoProvider({ children }: { children: React.ReactNode }) {
         console.log('[LingoClient] ← Received:', JSON.stringify(data));
 
         switch (data.type) {
+          case 'INIT':
+          setSocketId(data.socketId);
+          break;
           case 'MCP_READY':
             clearTimeout(timeoutId);
             console.log('[LingoClient] ✓ MCP_READY received');
@@ -160,6 +165,7 @@ export function LingoProvider({ children }: { children: React.ReactNode }) {
       targetLanguage, 
       mcpSessionId, 
       messages, 
+      socketId,
       sendMessage,
       setLanguage
     }}>
