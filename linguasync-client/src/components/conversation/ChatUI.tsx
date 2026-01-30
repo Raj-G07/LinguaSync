@@ -7,7 +7,6 @@ import { LanguageIcon } from "../ui/language";
 import { PaperAirplaneIcon } from "../ui/paper-airplane";
 // --- Icon Components (self-contained to avoid external dependencies) ---
 
-
 const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -170,14 +169,18 @@ const MessageList = () => {
         <div
           key={msg.id}
           className={`flex flex-col ${
-            msg.sender === socketId ? "items-start" : "items-end"
+            msg.sender !== socketId ? "items-start" : "items-end"
           }`}
         >
-          <div className="text-xs text-[#69e300] mb-1 font-medium">
+          <div className={`text-xs ${msg.sender !== socketId ? "text-[#69e300]" : "text-zinc-400"} mb-1 font-medium`}>
             {msg.sender === socketId ? "You" : msg.sender}
           </div>
-          <div className={`rounded-lg ${msg.sender === socketId ? "bg-[#69e300]" : "bg-zinc-900"} px-4 py-2.5 max-w-[85%] sm:max-w-[75%]`}>
-            <p className={`${msg.sender === socketId ? "text-black" : "text-zinc-200"} whitespace-pre-wrap break-words`}>
+          <div
+            className={`rounded-2xl max-w-[75%] ${msg.sender === socketId ? `bg-[#69e300] rounded-tr-sm` : `bg-zinc-900 rounded-tl-sm`} px-4 py-2.5 max-w-[85%] sm:max-w-[75%]`}
+          >
+            <p
+              className={`${msg.sender === socketId ? "text-black" : "text-zinc-200"} whitespace-pre-wrap break-words`}
+            >
               {msg.content}
             </p>
           </div>
@@ -239,7 +242,7 @@ const MessageInput = () => {
           aria-label="Send message"
           className="bg-[#69e300] text-black rounded-full p-2 flex items-center justify-center hover:bg-[#7fed1a] transition-colors disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-[#69e300]"
         >
-          <PaperAirplaneIcon/>
+          <PaperAirplaneIcon />
         </button>
       </form>
       <div className="flex items-center justify-center gap-2 text-xs text-zinc-600 text-center pt-3">
@@ -265,7 +268,16 @@ export default function ChatUI() {
   return (
     <div className="flex flex-col h-full bg-[#0a0a0a] text-zinc-200 rounded-lg overflow-hidden border border-zinc-900 shadow-2xl shadow-black/30">
       <ChatHeader />
-      <main className="flex-1 overflow-y-auto">
+      <main
+        className={`
+        flex-1 overflow-y-auto
+        [&::-webkit-scrollbar]:w-[6px]
+        [&::-webkit-scrollbar-thumb]:bg-[#6ae300e1]
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-track]:bg-transparent
+        [&::-webkit-scrollbar:horizontal]:h-[4px]
+  `}
+      >
         <MessageList />
       </main>
       <MessageInput />
